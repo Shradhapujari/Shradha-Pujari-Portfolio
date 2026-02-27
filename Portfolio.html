@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Developer Portfolio – Data Visualization & Web Development</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Sora:wght@300;400;600;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highcharts/11.2.0/highcharts.js"></script>
+<style>
+  :root {
+    --navy: #0a1628;
+    --deep: #0d2040;
+    --teal: #00c9a7;
+    --cyan: #0af0e0;
+    --blue: #1a73e8;
+    --muted: #8a9bb0;
+    --light: #e8f1ff;
+    --card-bg: rgba(255,255,255,0.04);
+    --border: rgba(0,201,167,0.2);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--navy);
+    color: var(--light);
+    font-family: 'Sora', sans-serif;
+    overflow-x: hidden;
+  }
+
+  /* BACKGROUND GRID */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,201,167,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,201,167,0.04) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* GLOW ORBS */
+  .orb {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(80px);
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.35;
+    animation: drift 12s ease-in-out infinite alternate;
+  }
+  .orb-1 { width: 500px; height: 500px; background: #003d6b; top: -100px; left: -100px; }
+  .orb-2 { width: 400px; height: 400px; background: #003830; bottom: 100px; right: -100px; animation-delay: -5s; }
+  .orb-3 { width: 300px; height: 300px; background: #0a1f4e; top: 40%; left: 40%; animation-delay: -8s; }
+
+  @keyframes drift {
+    from { transform: translate(0, 0) scale(1); }
+    to { transform: translate(30px, 30px) scale(1.1); }
+  }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 60px;
+    background: rgba(10,22,40,0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .nav-logo {
+    font-family: 'Space Mono', monospace;
+    font-size: 1.1rem;
+    color: var(--teal);
+    letter-spacing: 0.05em;
+  }
+
+  .nav-links { display: flex; gap: 32px; }
+  .nav-links a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 0.85rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    transition: color 0.3s;
+  }
+  .nav-links a:hover { color: var(--teal); }
+
+  /* SECTIONS */
+  section {
+    position: relative;
+    z-index: 1;
+    padding: 100px 60px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  /* HERO */
+  #hero {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    padding-top: 140px;
+    max-width: 100%;
+    padding-left: 80px;
+    padding-right: 80px;
+  }
+
+  .hero-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  .hero-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(0,201,167,0.1);
+    border: 1px solid rgba(0,201,167,0.3);
+    border-radius: 100px;
+    padding: 6px 16px;
+    font-size: 0.75rem;
+    color: var(--teal);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 28px;
+    animation: fadeUp 0.8s ease both;
+  }
+
+  .hero-tag::before {
+    content: '';
+    width: 8px; height: 8px;
+    background: var(--teal);
+    border-radius: 50%;
+    animation: pulse 2s ease infinite;
+  }
+
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+  h1 {
+    font-size: clamp(2.8rem, 6vw, 5rem);
+    font-weight: 800;
+    line-height: 1.05;
+    margin-bottom: 24px;
+    animation: fadeUp 0.8s 0.1s ease both;
+  }
+
+  h1 .accent { color: var(--teal); }
+
+  .hero-sub {
+    font-size: 1.15rem;
+    color: var(--muted);
+    max-width: 560px;
+    line-height: 1.7;
+    margin-bottom: 48px;
+    font-weight: 300;
+    animation: fadeUp 0.8s 0.2s ease both;
+  }
+
+  .hero-cta {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    animation: fadeUp 0.8s 0.3s ease both;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 28px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.3s;
+    border: none;
+  }
+
+  .btn-primary {
+    background: var(--teal);
+    color: var(--navy);
+  }
+  .btn-primary:hover { background: var(--cyan); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,201,167,0.3); }
+
+  .btn-outline {
+    background: transparent;
+    color: var(--light);
+    border: 1px solid rgba(255,255,255,0.2);
+  }
+  .btn-outline:hover { border-color: var(--teal); color: var(--teal); }
+
+  .hero-stats {
+    display: flex;
+    gap: 48px;
+    margin-top: 64px;
+    padding-top: 48px;
+    border-top: 1px solid var(--border);
+    animation: fadeUp 0.8s 0.4s ease both;
+  }
+
+  .stat-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 2rem;
+    color: var(--teal);
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .stat-label {
+    font-size: 0.8rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* SECTION HEADER */
+  .section-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--teal);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .section-title {
+    font-size: clamp(1.8rem, 3vw, 2.6rem);
+    font-weight: 800;
+    margin-bottom: 16px;
+    line-height: 1.15;
+  }
+
+  .section-desc {
+    color: var(--muted);
+    font-size: 1rem;
+    max-width: 500px;
+    line-height: 1.7;
+    font-weight: 300;
+    margin-bottom: 56px;
+  }
+
+  /* SKILLS GRID */
+  .skills-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+  }
+
+  .skill-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+    cursor: default;
+  }
+
+  .skill-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(0,201,167,0.06), transparent);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .skill-card:hover { border-color: rgba(0,201,167,0.5); transform: translateY(-4px); box-shadow: 0 12px 40px rgba(0,0,0,0.3); }
+  .skill-card:hover::before { opacity: 1; }
+
+  .skill-icon {
+    font-size: 1.8rem;
+    margin-bottom: 16px;
+    display: block;
+  }
+
+  .skill-name {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+
+  .skill-desc {
+    font-size: 0.83rem;
+    color: var(--muted);
+    line-height: 1.6;
+    margin-bottom: 16px;
+  }
+
+  .skill-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .tag {
+    background: rgba(0,201,167,0.1);
+    border: 1px solid rgba(0,201,167,0.2);
+    color: var(--teal);
+    font-size: 0.7rem;
+    padding: 3px 10px;
+    border-radius: 100px;
+    font-family: 'Space Mono', monospace;
+    letter-spacing: 0.05em;
+  }
+
+  /* CHART DASHBOARD */
+  .dashboard-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+
+  @media (max-width: 768px) {
+    .dashboard-grid { grid-template-columns: 1fr; }
+  }
+
+  .chart-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+    transition: all 0.3s;
+  }
+
+  .chart-card:hover {
+    border-color: rgba(0,201,167,0.4);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+  }
+
+  .chart-card.wide { grid-column: span 2; }
+  @media (max-width: 768px) { .chart-card.wide { grid-column: span 1; } }
+
+  .chart-card h3 {
+    font-size: 0.85rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 4px;
+    font-family: 'Space Mono', monospace;
+  }
+
+  .chart-card .chart-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 20px;
+    color: var(--light);
+  }
+
+  .chart-container { width: 100%; }
+
+  /* PROJECTS */
+  .projects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 24px;
+  }
+
+  .project-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    transition: all 0.3s;
+  }
+
+  .project-card:hover {
+    border-color: rgba(0,201,167,0.5);
+    transform: translateY(-4px);
+    box-shadow: 0 16px 48px rgba(0,0,0,0.35);
+  }
+
+  .project-header {
+    padding: 32px 28px 20px;
+    background: linear-gradient(135deg, rgba(0,201,167,0.1), rgba(26,115,232,0.08));
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .project-icon { font-size: 2.2rem; }
+
+  .project-type {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.68rem;
+    color: var(--teal);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    background: rgba(0,201,167,0.1);
+    border: 1px solid rgba(0,201,167,0.2);
+    padding: 4px 12px;
+    border-radius: 100px;
+  }
+
+  .project-body { padding: 24px 28px; }
+
+  .project-body h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+
+  .project-body p {
+    font-size: 0.87rem;
+    color: var(--muted);
+    line-height: 1.65;
+    margin-bottom: 20px;
+  }
+
+  /* TIMELINE */
+  .timeline {
+    position: relative;
+    padding-left: 32px;
+  }
+
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 8px; bottom: 0;
+    width: 2px;
+    background: linear-gradient(to bottom, var(--teal), transparent);
+  }
+
+  .timeline-item {
+    position: relative;
+    margin-bottom: 48px;
+    padding-left: 24px;
+  }
+
+  .timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -38px; top: 6px;
+    width: 12px; height: 12px;
+    background: var(--teal);
+    border-radius: 50%;
+    box-shadow: 0 0 0 4px rgba(0,201,167,0.2);
+  }
+
+  .timeline-date {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--teal);
+    letter-spacing: 0.1em;
+    margin-bottom: 6px;
+  }
+
+  .timeline-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+
+  .timeline-org {
+    font-size: 0.85rem;
+    color: var(--teal);
+    margin-bottom: 10px;
+  }
+
+  .timeline-desc {
+    font-size: 0.87rem;
+    color: var(--muted);
+    line-height: 1.65;
+  }
+
+  /* CONTACT */
+  #contact {
+    max-width: 100%;
+    background: linear-gradient(135deg, rgba(0,201,167,0.05), rgba(10,22,40,0));
+    border-top: 1px solid var(--border);
+    text-align: center;
+    padding: 100px 60px;
+  }
+
+  .contact-inner { max-width: 600px; margin: 0 auto; }
+
+  .contact-links {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-top: 40px;
+  }
+
+  .contact-link {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 0.88rem;
+    transition: all 0.3s;
+  }
+
+  .contact-link:hover { border-color: var(--teal); color: var(--teal); transform: translateY(-2px); }
+
+  footer {
+    text-align: center;
+    padding: 32px;
+    border-top: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 0.8rem;
+    font-family: 'Space Mono', monospace;
+    position: relative; z-index: 1;
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 768px) {
+    nav { padding: 16px 24px; }
+    .nav-links { display: none; }
+    #hero { padding: 140px 24px 80px; }
+    section { padding: 80px 24px; }
+    .hero-stats { gap: 24px; flex-wrap: wrap; }
+    .skills-grid { grid-template-columns: 1fr; }
+  }
+
+  /* SCROLL REVEAL */
+  .reveal {
+    opacity: 0;
+    transform: translateY(32px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: none;
+  }
+</style>
+</head>
+<body>
+
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+<div class="orb orb-3"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">&lt;YourName /&gt;</div>
+  <div class="nav-links">
+    <a href="#skills">Skills</a>
+    <a href="#dashboard">Data Viz</a>
+    <a href="#projects">Projects</a>
+    <a href="#experience">Experience</a>
+    <a href="#contact">Contact</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div id="hero">
+  <div class="hero-inner">
+    <div class="hero-tag">Available for Opportunities</div>
+    <h1>Data Visualization<br>&amp; <span class="accent">Web Developer</span></h1>
+    <p class="hero-sub">I build interactive dashboards, integrate APIs, and create data-driven web experiences using Angular, WordPress, Highcharts, Power Pages, and more.</p>
+    <div class="hero-cta">
+      <a href="#dashboard" class="btn btn-primary">▶ View Live Charts</a>
+      <a href="#contact" class="btn btn-outline">Get In Touch →</a>
+    </div>
+    <div class="hero-stats">
+      <div>
+        <div class="stat-num">10+</div>
+        <div class="stat-label">Tech Skills</div>
+      </div>
+      <div>
+        <div class="stat-num">5+</div>
+        <div class="stat-label">Projects Built</div>
+      </div>
+      <div>
+        <div class="stat-num">3+</div>
+        <div class="stat-label">Years Dev Exp</div>
+      </div>
+      <div>
+        <div class="stat-num">∞</div>
+        <div class="stat-label">Data Visualized</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SKILLS -->
+<section id="skills">
+  <div class="section-label">// 01 — Expertise</div>
+  <h2 class="section-title">A Full Stack of Skills</h2>
+  <p class="section-desc">From frontend frameworks to cloud hosting, here's what I bring to every project.</p>
+
+  <div class="skills-grid reveal">
+    <div class="skill-card">
+      <span class="skill-icon">⚡</span>
+      <div class="skill-name">Angular Development</div>
+      <div class="skill-desc">Building dynamic, component-based web applications with TypeScript and Angular CLI.</div>
+      <div class="skill-tags"><span class="tag">Angular</span><span class="tag">TypeScript</span><span class="tag">RxJS</span></div>
+    </div>
+    <div class="skill-card">
+      <span class="skill-icon">📊</span>
+      <div class="skill-name">Data Visualization</div>
+      <div class="skill-desc">Creating interactive, real-time charts and dashboards using Highcharts and Chart.js.</div>
+      <div class="skill-tags"><span class="tag">Highcharts</span><span class="tag">Chart.js</span><span class="tag">Dashboards</span></div>
+    </div>
+    <div class="skill-card">
+      <span class="skill-icon">🌐</span>
+      <div class="skill-name">WordPress</div>
+      <div class="skill-desc">Theme development, plugin customization, performance optimization, and content management.</div>
+      <div class="skill-tags"><span class="tag">WordPress</span><span class="tag">PHP</span><span class="tag">WP REST API</span></div>
+    </div>
+    <div class="skill-card">
+      <span class="skill-icon">🔗</span>
+      <div class="skill-name">API Integration</div>
+      <div class="skill-desc">Connecting applications to third-party services via REST APIs, handling auth and data transformation.</div>
+      <div class="skill-tags"><span class="tag">REST API</span><span class="tag">JSON</span><span class="tag">OAuth</span></div>
+    </div>
+    <div class="skill-card">
+      <span class="skill-icon">🟦</span>
+      <div class="skill-name">Microsoft Power Pages</div>
+      <div class="skill-desc">Low-code portal development on the Microsoft Power Platform for data collection and display.</div>
+      <div class="skill-tags"><span class="tag">Power Pages</span><span class="tag">Dataverse</span><span class="tag">Power FX</span></div>
+    </div>
+    <div class="skill-card">
+      <span class="skill-icon">📈</span>
+      <div class="skill-name">Microsoft Excel & Stats</div>
+      <div class="skill-desc">Advanced data analysis, pivot tables, Power Query, statistical modeling, and automated reporting.</div>
+      <div class="skill-tags"><span class="tag">Excel</span><span class="tag">Power Query</span><span class="tag">Statistics</span></div>
+    </div>
+    <div class="skill-card">
+      <span class="skill-icon">☁️</span>
+      <div class="skill-name">Cloud & Web Hosting</div>
+      <div class="skill-desc">Deploying and maintaining apps on Google Cloud (Firebase), cPanel, and managed hosting.</div>
+      <div class="skill-tags"><span class="tag">Google Cloud</span><span class="tag">Firebase</span><span class="tag">cPanel</span></div>
+    </div>
+    <div class="skill-card">
+      <span class="skill-icon">🔄</span>
+      <div class="skill-name">Data Migration</div>
+      <div class="skill-desc">Migrating databases and web platforms with data integrity, mapping, and validation processes.</div>
+      <div class="skill-tags"><span class="tag">SQL</span><span class="tag">ETL</span><span class="tag">Migration</span></div>
+    </div>
+    <div class="skill-card">
+      <span class="skill-icon">🛠️</span>
+      <div class="skill-name">Maintenance & DevOps</div>
+      <div class="skill-desc">Ongoing web maintenance, bug fixes, performance monitoring, SSL, DNS, and uptime management.</div>
+      <div class="skill-tags"><span class="tag">Git</span><span class="tag">DevOps</span><span class="tag">Monitoring</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- LIVE DASHBOARD / DATA VIZ DEMO -->
+<section id="dashboard" style="max-width: 100%; background: rgba(0,0,0,0.2); padding: 100px 80px;">
+  <div style="max-width: 1200px; margin: 0 auto;">
+    <div class="section-label">// 02 — Live Demo</div>
+    <h2 class="section-title">Interactive Data Dashboard</h2>
+    <p class="section-desc">Real Highcharts visualizations — the same technology used in production projects.</p>
+
+    <div class="dashboard-grid reveal">
+      <div class="chart-card">
+        <h3>Community Metric</h3>
+        <div class="chart-title">Monthly Survey Responses (2024)</div>
+        <div id="chart-bar" class="chart-container" style="height:260px;"></div>
+      </div>
+
+      <div class="chart-card">
+        <h3>Regional Data</h3>
+        <div class="chart-title">Climate Risk Score by District</div>
+        <div id="chart-radar" class="chart-container" style="height:260px;"></div>
+      </div>
+
+      <div class="chart-card wide">
+        <h3>Trend Analysis</h3>
+        <div class="chart-title">Environmental Indicators Over Time (2020–2024)</div>
+        <div id="chart-line" class="chart-container" style="height:280px;"></div>
+      </div>
+
+      <div class="chart-card">
+        <h3>Distribution</h3>
+        <div class="chart-title">Project Type Breakdown</div>
+        <div id="chart-donut" class="chart-container" style="height:260px;"></div>
+      </div>
+
+      <div class="chart-card">
+        <h3>Statistics</h3>
+        <div class="chart-title">Skill Proficiency Levels</div>
+        <div id="chart-gauge" class="chart-container" style="height:260px;"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROJECTS -->
+<section id="projects">
+  <div class="section-label">// 03 — Portfolio</div>
+  <h2 class="section-title">Featured Projects</h2>
+  <p class="section-desc">A selection of work spanning data visualization, web development, and platform solutions.</p>
+
+  <div class="projects-grid reveal">
+    <div class="project-card">
+      <div class="project-header">
+        <span class="project-icon">📊</span>
+        <span class="project-type">Data Viz</span>
+      </div>
+      <div class="project-body">
+        <h3>Community Analytics Dashboard</h3>
+        <p>Interactive Angular + Highcharts dashboard visualizing regional demographic, environmental, and survey data for community planning use cases.</p>
+        <div class="skill-tags"><span class="tag">Angular</span><span class="tag">Highcharts</span><span class="tag">REST API</span></div>
+      </div>
+    </div>
+
+    <div class="project-card">
+      <div class="project-header">
+        <span class="project-icon">🌐</span>
+        <span class="project-type">WordPress</span>
+      </div>
+      <div class="project-body">
+        <h3>Nonprofit Data Website</h3>
+        <p>WordPress site with embedded data tables, custom Chart.js visualizations, and Excel-sourced content for a community-focused nonprofit organization.</p>
+        <div class="skill-tags"><span class="tag">WordPress</span><span class="tag">Chart.js</span><span class="tag">Excel</span></div>
+      </div>
+    </div>
+
+    <div class="project-card">
+      <div class="project-header">
+        <span class="project-icon">🟦</span>
+        <span class="project-type">Power Platform</span>
+      </div>
+      <div class="project-body">
+        <h3>Internal Data Portal</h3>
+        <p>Microsoft Power Pages portal enabling internal data collection, reporting workflows, and role-based access for staff across departments.</p>
+        <div class="skill-tags"><span class="tag">Power Pages</span><span class="tag">Dataverse</span><span class="tag">Power FX</span></div>
+      </div>
+    </div>
+
+    <div class="project-card">
+      <div class="project-header">
+        <span class="project-icon">☁️</span>
+        <span class="project-type">Cloud / Migration</span>
+      </div>
+      <div class="project-body">
+        <h3>Database & Platform Migration</h3>
+        <p>Migrated legacy database and website to Google Cloud (Firebase) with full data validation, SSL setup, DNS configuration, and zero downtime deployment.</p>
+        <div class="skill-tags"><span class="tag">Firebase</span><span class="tag">SQL</span><span class="tag">ETL</span></div>
+      </div>
+    </div>
+
+    <div class="project-card">
+      <div class="project-header">
+        <span class="project-icon">📈</span>
+        <span class="project-type">Excel / BI</span>
+      </div>
+      <div class="project-body">
+        <h3>Statistical Survey Analysis</h3>
+        <p>Built comprehensive Excel workbooks using Power Query and pivot tables to analyze survey data from 500+ respondents, producing visual summary reports.</p>
+        <div class="skill-tags"><span class="tag">Excel</span><span class="tag">Power Query</span><span class="tag">Statistics</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- EXPERIENCE -->
+<section id="experience">
+  <div class="section-label">// 04 — Background</div>
+  <h2 class="section-title">Experience & Education</h2>
+  <p class="section-desc">My journey building web and data solutions across real-world projects.</p>
+
+  <div class="timeline reveal">
+    <div class="timeline-item">
+      <div class="timeline-date">2022 – Present</div>
+      <div class="timeline-title">Data Visualization Developer & Web Developer</div>
+      <div class="timeline-org">Freelance / Project-Based</div>
+      <div class="timeline-desc">Built interactive dashboards with Highcharts and Angular; integrated REST APIs; developed and maintained WordPress sites; performed data analysis and reporting using Excel; migrated databases to cloud platforms.</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-date">2020 – 2022</div>
+      <div class="timeline-title">Web Developer & BI Analyst</div>
+      <div class="timeline-org">Previous Organization</div>
+      <div class="timeline-desc">Developed Power Pages portals; produced statistical analyses from community surveys; managed web hosting infrastructure; collaborated cross-functionally to deliver data-driven reporting tools.</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-date">Expected 2025</div>
+      <div class="timeline-title">Bachelor of Science – [Your Major]</div>
+      <div class="timeline-org">[Your University]</div>
+      <div class="timeline-desc">Relevant coursework in data analysis, statistics, and information systems. Active in research and community-oriented projects.</div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<div id="contact">
+  <div class="contact-inner">
+    <div class="section-label" style="text-align:center;">// 05 — Let's Work Together</div>
+    <h2 class="section-title">Ready to Collaborate</h2>
+    <p class="section-desc" style="max-width:100%; margin: 0 auto 0;">Whether you need data visualizations, a web platform, or analytical support — I'm ready to contribute.</p>
+    <div class="contact-links">
+      <a href="mailto:your.email@email.com" class="contact-link">✉️ your.email@email.com</a>
+      <a href="https://linkedin.com/in/yourprofile" class="contact-link">🔗 LinkedIn</a>
+      <a href="https://github.com/yourprofile" class="contact-link">🐙 GitHub</a>
+    </div>
+  </div>
+</div>
+
+<footer>
+  Built with HTML, CSS, JavaScript + Highcharts &nbsp;|&nbsp; © 2026 Your Name
+</footer>
+
+<script>
+// ====== HIGHCHARTS THEME ======
+const theme = {
+  chart: {
+    backgroundColor: 'transparent',
+    style: { fontFamily: 'Sora, sans-serif' }
+  },
+  title: { text: null },
+  credits: { enabled: false },
+  colors: ['#00c9a7', '#1a73e8', '#0af0e0', '#f59e0b', '#e24b5f', '#8b5cf6'],
+  xAxis: {
+    gridLineColor: 'rgba(255,255,255,0.05)',
+    lineColor: 'rgba(255,255,255,0.1)',
+    labels: { style: { color: '#8a9bb0', fontSize: '11px' } },
+    tickColor: 'rgba(255,255,255,0.1)'
+  },
+  yAxis: {
+    gridLineColor: 'rgba(255,255,255,0.06)',
+    labels: { style: { color: '#8a9bb0', fontSize: '11px' } },
+    title: { style: { color: '#8a9bb0' } }
+  },
+  legend: {
+    itemStyle: { color: '#8a9bb0', fontSize: '11px' },
+    itemHoverStyle: { color: '#e8f1ff' }
+  },
+  tooltip: {
+    backgroundColor: '#0d2040',
+    borderColor: '#00c9a7',
+    borderRadius: 8,
+    style: { color: '#e8f1ff' }
+  }
+};
+Highcharts.setOptions(theme);
+
+// BAR CHART
+Highcharts.chart('chart-bar', {
+  chart: { type: 'column' },
+  xAxis: { categories: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'] },
+  yAxis: { title: { text: 'Responses' } },
+  series: [{
+    name: 'Survey Responses',
+    data: [42, 58, 74, 81, 95, 110, 132, 128, 104, 88, 71, 60],
+    color: {
+      linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
+      stops: [[0, '#00c9a7'], [1, 'rgba(0,201,167,0.2)']]
+    },
+    borderRadius: 4
+  }]
+});
+
+// SPIDER/RADAR (using polar chart)
+Highcharts.chart('chart-radar', {
+  chart: { polar: true, type: 'area' },
+  xAxis: {
+    categories: ['Infrastructure','Water','Air Quality','Heat Risk','Flood Risk','Community'],
+    tickmarkPlacement: 'on',
+    lineWidth: 0,
+    labels: { style: { color: '#8a9bb0', fontSize: '10px' } }
+  },
+  yAxis: { gridLineInterpolation: 'polygon', lineWidth: 0, min: 0, max: 10, labels: { enabled: false } },
+  series: [
+    { name: 'District A', data: [7,8,6,9,5,7], pointPlacement: 'on', fillOpacity: 0.25 },
+    { name: 'District B', data: [5,6,8,6,7,9], pointPlacement: 'on', fillOpacity: 0.25 }
+  ]
+});
+
+// LINE CHART
+Highcharts.chart('chart-line', {
+  chart: { type: 'areaspline' },
+  xAxis: { categories: ['2020','2021','2022','2023','2024'] },
+  yAxis: { title: { text: 'Index Score' } },
+  series: [
+    { name: 'Air Quality Index', data: [62, 65, 70, 74, 78], fillOpacity: 0.15 },
+    { name: 'Green Infrastructure', data: [38, 44, 52, 61, 69], fillOpacity: 0.15 },
+    { name: 'Resilience Score', data: [55, 58, 64, 70, 77], fillOpacity: 0.15 }
+  ]
+});
+
+// DONUT
+Highcharts.chart('chart-donut', {
+  chart: { type: 'pie' },
+  plotOptions: {
+    pie: {
+      innerSize: '55%',
+      dataLabels: { style: { color: '#8a9bb0', fontSize: '11px' }, connectorColor: '#2a3f5f' }
+    }
+  },
+  series: [{
+    name: 'Projects',
+    data: [
+      { name: 'Data Viz', y: 30 },
+      { name: 'Web Dev', y: 25 },
+      { name: 'API Integration', y: 20 },
+      { name: 'Power Platform', y: 15 },
+      { name: 'Migration', y: 10 }
+    ]
+  }]
+});
+
+// GAUGE / BAR CHART for Skills
+Highcharts.chart('chart-gauge', {
+  chart: { type: 'bar' },
+  xAxis: { categories: ['Highcharts','Angular','WordPress','Excel','Power Pages','API Integration'] },
+  yAxis: { min: 0, max: 100, title: { text: 'Proficiency %' } },
+  plotOptions: {
+    bar: {
+      dataLabels: { enabled: true, format: '{y}%', style: { color: '#8a9bb0' } },
+      borderRadius: 4
+    }
+  },
+  series: [{
+    name: 'Proficiency',
+    data: [88, 82, 90, 92, 78, 85],
+    color: {
+      linearGradient: { x1: 0, y1: 0, x2: 1, y2: 0 },
+      stops: [[0, 'rgba(0,201,167,0.4)'], [1, '#00c9a7']]
+    }
+  }]
+});
+
+// SCROLL REVEAL
+const reveals = document.querySelectorAll('.reveal');
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('visible'); }
+  });
+}, { threshold: 0.1 });
+reveals.forEach(r => observer.observe(r));
+</script>
+</body>
+</html>
